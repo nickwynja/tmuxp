@@ -128,7 +128,7 @@ class WorkspaceBuilder(object):
                     {'session_name': self.sconf['session_name']}
                 )
                 raise TmuxSessionExists(
-                    'Session name %s is already running.' % self.sconf['session_name']
+                    session = self.server.switch_client(self.sconf['session_name'])
                 )
             else:
                 session = self.server.new_session(
@@ -353,7 +353,8 @@ class WorkspaceBuilder(object):
                 w.set_window_option(key, val)
 
     def find_current_attached_session(self):
-        return self.server.list_sessions()[0]
+        sid = self.server.cmd("display", "-pt", os.environ['TMUX_PANE'], "#{session_id}")
+        return self.server.get_by_id(sid.stdout[0])
 
     def first_window_pass(self, i, session, append_same_sassion):
         return len(session.windows) == 1 and i == 1 and not append_same_sassion
